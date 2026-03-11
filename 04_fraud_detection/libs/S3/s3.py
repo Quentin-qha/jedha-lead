@@ -1,5 +1,27 @@
 import os
 import boto3
+import pandas as pd
+from io import StringIO
+from dotenv import load_dotenv
+
+def s3_get_datas(bucket_url, bucket_key):
+    load_dotenv()
+
+    session = boto3.Session(
+        aws_access_key_id     = os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY"),
+        region_name           = os.getenv("AWS_DEFAULT_REGION")
+    )
+
+    s3 = session.client("s3")
+
+    # bucket = "jedha-fraud-detection-qha"
+    # key    = "model_datas/fraudTest.csv"
+
+    obj = s3.get_object(Bucket=bucket_url, Key=bucket_key)
+    df  = pd.read_csv(StringIO(obj['Body'].read().decode('utf-8')))
+
+    return df
 
 def s3_client():
     return boto3.client(
