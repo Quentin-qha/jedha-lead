@@ -1,39 +1,17 @@
 version: '1.2'
 
 services:
-  airflow-db:
-    image: postgres:16
-    container_name: airflow-db
-    environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
-    volumes:
-      - airflow_db_data:/var/lib/postgresql/data
-
-  mlflow-db:
-    image: postgres:13
-    container_name: mlflow-db
-    environment:
-      POSTGRES_USER: mlflow
-      POSTGRES_PASSWORD: mlflow
-      POSTGRES_DB: mlflow
-    volumes:
-      - mlflow_db_data:/var/lib/postgresql/data
-
   airflow-init:
     build:
       context: .
       dockerfile: docker/Dockerfile.airflow
     container_name: airflow-init
-    depends_on:
-      - airflow-db
     env_file:
       - .env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_DB_URL}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_WEBSERVER_SECRET_KEY}
       AIRFLOW__CORE__DEFAULT_TIMEZONE: Europe/Paris
@@ -59,10 +37,12 @@ services:
       - airflow-init
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_DB_URL}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_WEBSERVER_SECRET_KEY}
       AIRFLOW__CORE__DEFAULT_TIMEZONE: Europe/Paris
@@ -72,7 +52,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT}
     volumes:
-      - ./dags:/opt/airflow/dags
+      - ./services/airflow/dags:/opt/airflow/dags
+      - ./libs:/opt/airflow/libs
+      - ./src:/opt/airflow/src
       - airflow_logs:/opt/airflow/logs
     command: webserver
 
@@ -83,10 +65,12 @@ services:
     container_name: airflow-scheduler
     depends_on:
       - airflow-init
+    env_file:
+      - .env
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${AIRFLOW_DB_URL}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_WEBSERVER_SECRET_KEY}
       AIRFLOW__CORE__DEFAULT_TIMEZONE: Europe/Paris
@@ -95,8 +79,15 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      ALERT_EMAIL_TO: ${ALERT_EMAIL_TO}
     volumes:
-      - ./dags:/opt/airflow/dags
+      - ./services/airflow/dags:/opt/airflow/dags
+      - ./libs:/opt/airflow/libs
+      - ./src:/opt/airflow/src
       - airflow_logs:/opt/airflow/logs
     command: scheduler
 
@@ -104,14 +95,11 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.mlflow
-    # image: ghcr.io/mlflow/mlflow:latest
     container_name: mlflow
-    depends_on:
-      - mlflow-db
     env_file:
       - .env
     environment:
-      MLFLOW_BACKEND_STORE_URI: postgresql+psycopg2://mlflow:mlflow@mlflow-db:5432/mlflow
+      MLFLOW_BACKEND_STORE_URI: ${MLFLOW_DB_URL}
       MLFLOW_DEFAULT_ARTIFACT_ROOT: ${MLFLOW_BUCKET}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
@@ -119,7 +107,7 @@ services:
     volumes:
       - ./mlflow_data:/mlflow
     command: >
-      bash -lc "mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql+psycopg2://mlflow:mlflow@mlflow-db:5432/mlflow --artifacts-destination /mlflow/artifacts --serve-artifacts"
+      bash -lc "mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri ${MLFLOW_DB_URL} --artifacts-destination /mlflow/artifacts --serve-artifacts"
     ports:
       - "5000:5000"
     healthcheck:
@@ -128,9 +116,41 @@ services:
       timeout: 5s
       retries: 20
 
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: api
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_EXPERIMENT_NAME: ${MLFLOW_EXPERIMENT_NAME:-fraud_detection}
+    ports:
+      - "8000:8000"
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.streamlit
+    container_name: streamlit
+    env_file:
+      - .env
+    ports:
+      - "8501:8501"
 
 volumes:
-  airflow_db_data:
-  mlflow_db_data:
   airflow_logs:
   mlflow_data:
+
+networks:
+  default:
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: "172.28.0.0/16"
+        - subnet: "2001:db8::/32"

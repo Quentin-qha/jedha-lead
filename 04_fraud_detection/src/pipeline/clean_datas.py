@@ -55,18 +55,17 @@ def clean_datas_history(df, call_type="csv"):
 
             df = df.drop(columns=["trans_date_trans_time"])
         elif call_type == "api":
-            drop_cols = ["cc_num", "trans_num", "merchant", "first", "last", "street", "zip", "trans_num", "city"]
-
+            drop_cols = ["cc_num", "trans_num", "merchant", "first", "last", "street", "zip", "trans_num", "city", "current_time", "is_fraud"]
+            
             # Split date time columns in day, month, year, hour
-            #df["current_time"] = pd.to_datetime(df["current_time"])
+            df["current_time"] = pd.to_datetime(df["current_time"])
 
             df["trans_hour"]  = df["current_time"].dt.hour
             df["trans_day"]   = df["current_time"].dt.day
             df["trans_month"] = df["current_time"].dt.month
-            #df["trans_year"]  = df["trans_date_trans_time"].dt.year #Not keeped because all the date are in 2020
+            #df["trans_year"]  = df["current_time"].dt.year #Not keeped because all the date are in 2020
 
-
-        df = df.drop(columns=drop_cols)
+        df = df.drop(columns=[c for c in drop_cols if c in df.columns])
 
         #Customer age
         df["dob"] = pd.to_datetime(df["dob"])
@@ -94,3 +93,59 @@ def clean_datas_history(df, call_type="csv"):
         return df
     else:
         print("No datas in the dataframe")
+
+
+# #CSV
+# {
+#     'Unnamed: 0': 0,
+#     'trans_date_trans_time': '2019-01-01 00:00:18',
+#     'cc_num': '2703186189652095',
+#     'merchant': 'fraud_Rippin, Kub and Mann',
+#     'category': 'misc_net',
+#     'amt': 4.97,
+#     'first': 'Jennifer',
+#     'last': 'Banks',
+#     'gender': 'F',
+#     'street': '561 Perry Cove',
+#     'city': 'Moravian Falls',
+#     'state': 'NC',
+#     'zip': '28654',
+#     'lat': 36.0788,
+#     'long': -81.1781,
+#     'city_pop': 3495,
+#     'job': 'Psychologist, counselling',
+#     'dob': '1988-03-09',
+#     'trans_num': '0b242abb623afc578575680df30655b9',
+#     'unix_time': 1325376018,
+#     'merch_lat': 36.011293,
+#     'merch_long': -82.048315,
+#     'is_fraud': 0,
+#     'current_time': '2019-01-01 00:00:18'
+# }
+
+# #API
+# {
+#     "cc_num":3506042666828517,
+#     "merchant":"fraud_Torp-Labadie",
+#     "category":"gas_transport",
+#     "amt":72.2,"first":"Christine",
+#     "last":"Burns",
+#     "gender":"F",
+#     "street":"343 Hannah Parkway",
+#     "city":"Comfort",
+#     "state":"WV",
+#     "zip":25049,
+#     "lat":38.1372,
+#     "long":-81.5962,
+#     "city_pop":630,
+#     "job":"Fine artist",
+#     "dob":"1959-07-30",
+#     "trans_num":"ba2fe068641429316cade78e6aa78d44",
+#     "merch_lat":37.656511,
+#     "merch_long":-82.472261,
+#     "is_fraud":0,
+#     "current_time":1773428283126,
+#     "trans_hour":18,
+#     "trans_day":13,
+#     "trans_month":3
+# }
