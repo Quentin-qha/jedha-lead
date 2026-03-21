@@ -5,7 +5,7 @@ def categorize_job(job):
     job = job.lower()
     if any(w in job for w in ["engineer", "developer", "data", "software", "tech", "it", "programmer", "web", "seismic", "geophysic", "statistician", "cartographer"]):
         return "tech"
-    elif any(w in job for w in ["health", "ambulance" "doctor", "nurse", "surgeon", "therapist", "medical", "paramedic", "radiograph", "optometrist", "chiropodist", "audiolog", "oncologist", "osteopath", "podiatrist", "pathologist", "immunologist", "physiologist", "toxicologist", "embryologist", "biochemist", "pharmacolog", "psychiatrist", "psychologist", "counsell", "optician", "herbalist", "acupuncturist", "orthoptist", "occupational hygienist", "clinical"]):
+    elif any(w in job for w in ["health", "ambulance", "doctor", "nurse", "surgeon", "therapist", "medical", "paramedic", "radiograph", "optometrist", "chiropodist", "audiolog", "oncologist", "osteopath", "podiatrist", "pathologist", "immunologist", "physiologist", "toxicologist", "embryologist", "biochemist", "pharmacolog", "psychiatrist", "psychologist", "counsell", "optician", "herbalist", "acupuncturist", "orthoptist", "occupational hygienist", "clinical"]):
         return "health"
     elif any(w in job for w in ["teacher", "professor", "lecturer", "educator", "tutor", "librarian", "archivist", "education", "mentor", "learning"]):
         return "education"

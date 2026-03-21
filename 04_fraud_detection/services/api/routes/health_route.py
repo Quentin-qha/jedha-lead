@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import JSONResponse
-from api.models.fraud_detection_models import HealthResponse, ReadyResponse
+from api.models.fraud_detection_models import HealthResponse
 
 """
 ===========================================================

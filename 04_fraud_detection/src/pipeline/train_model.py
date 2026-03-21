@@ -136,7 +136,6 @@ with mlflow.start_run():
     mlflow.log_metrics(metrics)
 
     # Model artifact — sauvegarde joblib pour compatibilité avec le serveur MLflow
-    import tempfile, joblib
     with tempfile.TemporaryDirectory() as tmpdir:
         model_path = os.path.join(tmpdir, "model.pkl")
         joblib.dump(pipeline, model_path)
