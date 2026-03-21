@@ -1,7 +1,5 @@
 # 1. Diagnostique
 
-# 1. Diagnostique
-
 | Dimension | Niveau | Forces | Faiblesses | Impact | Actions prioritaires |
 | --- | --- | --- | --- | --- | --- |
 | **Data Governance** | 2.5 | CDO et DPO identifiés. Forte culture data-driven. Initiatives locales dans Engineering, Marketing, Product. Engagement top management. | Absence de gouvernance formelle et unifiée. Peu de Data Stewards référents métiers. Pas de comité transverse. Silos par département et par région. | Fragmentation des pratiques. Incohérences entre départements. Multiples versions d'une même politique selon les marchés. | Créer un Data Governance Committee transverse. Nommer un CDO global avec mandat exécutif. Déployer un framework DMBOK unifié. Mettre en place un catalogue de données centralisé (Collibra). |
