@@ -2,4 +2,4 @@
 
 ## Vidéo de démonstration
 
-[![Démonstration du pipeline de détection de fraude](https://play.vidyard.com/1e26181d-e4c9-4493-943a-7a12ed38e657.jpg)](https://share.vidyard.com/watch/G1UdXHWpiTFqSQgMqWvQe6)
+[![Démonstration du pipeline de détection de fraude](https://play.vidyard.com/533543db-9274-4018-ab9b-13977ecb53af.jpg)](https://share.vidyard.com/watch/G1UdXHWpiTFqSQgMqWvQe6)
