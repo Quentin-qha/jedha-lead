@@ -2,38 +2,13 @@
 
 Projet de détection de fraude bancaire en temps réel, construit avec une architecture microservices complète : collecte automatisée, modèle ML, API de prédiction, stockage, alertes email et dashboard de monitoring.
 
----
+## Démonstration
+
+[![Démonstration du pipeline de détection de fraude](video_thumbnail.png)](https://share.vidyard.com/watch/G1UdXHWpiTFqSQgMqWvQe6)
 
 ## Architecture
 
-```
-Jedha API (source de données)
-        │
-        ▼  toutes les minutes
-┌──────────────────────────────────────────────────────┐
-│                   AIRFLOW (orchestrateur)             │
-│  1. Collecte transaction (GET Jedha API)              │
-│  2. Sauvegarde JSON brut → S3                         │
-│  3. Nettoyage & feature engineering                   │
-│  4. Prédiction → FastAPI                              │
-│  5. Stockage → Supabase                               │
-│  6. Alerte email si fraude détectée                   │
-└──────────────────────────────────────────────────────┘
-        │                    │                  │
-        ▼                    ▼                  ▼
-  ┌──────────┐        ┌──────────┐       ┌──────────────┐
-  │  FastAPI │◄──────►│  MLflow  │       │   Supabase   │
-  │ (predict)│        │ (modèle) │       │  (PostgreSQL)│
-  └──────────┘        └──────────┘       └──────────────┘
-                                                │
-                                                ▼
-                                        ┌──────────────┐
-                                        │  Streamlit   │
-                                        │ (dashboard)  │
-                                        └──────────────┘
-```
-
----
+![Schema_architecture](achitecture_schema.png)
 
 ## Stack technique
 
@@ -48,63 +23,6 @@ Jedha API (source de données)
 | Containerisation | Docker + Docker Compose |
 | Tests | pytest |
 
----
-
-## Structure du projet
-
-```
-04_fraud_detection/
-├── docker/                         # Dockerfiles par service
-│   ├── Dockerfile.api
-│   ├── Dockerfile.airflow
-│   ├── Dockerfile.mlflow
-│   └── Dockerfile.streamlit
-│
-├── services/
-│   ├── api/                        # FastAPI — service de prédiction
-│   │   ├── main.py
-│   │   ├── models/                 # Modèles Pydantic (requête/réponse)
-│   │   ├── routes/                 # Endpoints /predict et /health
-│   │   ├── utils/                  # Chargement modèle MLflow + inférence
-│   │   └── tests/                  # Tests unitaires avec pytest
-│   │
-│   ├── airflow/
-│   │   └── dags/
-│   │       └── fraud_detection_realtime.py   # DAG principal (1/min)
-│   │
-│   └── streamlit/
-│       └── app.py                  # Dashboard de monitoring
-│
-├── src/
-│   ├── pipeline/
-│   │   ├── clean_datas.py          # Feature engineering (âge, distance, heure, métier)
-│   │   └── train_model.py          # Entraînement RandomForest + log MLflow
-│   └── utils/
-│       ├── send_transaction_to_supabase.py   # Écriture en base
-│       └── send_alert_email.py               # Alertes SMTP
-│
-├── libs/
-│   ├── S3/s3.py                    # Upload/download S3
-│   └── db/supabase.py              # Connexion PostgreSQL
-│
-├── exploration/                    # Notebooks Jupyter
-│   ├── eda_csv.ipynb               # EDA complète avec visualisations
-│   ├── eda_api.ipynb               # Exploration des données temps réel
-│   ├── clean_code.ipynb            # Expérimentation du preprocessing
-│   └── xgboost_optimisation.ipynb  # Optimisation hyperparamètres XGBoost
-│
-├── requirements/                   # Dépendances par service
-│   ├── api_requirements.txt
-│   ├── airflow_requirements.txt
-│   ├── mlflow_requirements.txt
-│   └── streamlit_requirements.txt
-│
-├── .env                            # Variables d'environnement (non versionné)
-└── docker-compose.yml              # Orchestration des 6 services
-```
-
----
-
 ## Services & ports
 
 | Service | Port | Rôle |
@@ -113,8 +31,6 @@ Jedha API (source de données)
 | MLflow | 5000 | Suivi des expériences et modèles |
 | FastAPI | 8000 | API de prédiction (POST /predict) |
 | Streamlit | 8501 | Dashboard de monitoring |
-
----
 
 ## Installation et démarrage
 
@@ -220,8 +136,6 @@ La variable `MLFLOW_DB_URL` doit pointer sur ce schéma :
 postgresql://user:password@host:5432/postgres?options=-csearch_path%3Dmlflow
 ```
 
----
-
 ### 3. Configurer les variables d'environnement
 
 Créer un fichier `.env` à la racine du dossier `04_fraud_detection/` :
@@ -293,8 +207,6 @@ Le modèle est automatiquement sauvegardé dans MLflow. FastAPI charge le run av
 
 Le pipeline tourne ensuite automatiquement toutes les minutes.
 
----
-
 ## Pipeline de données
 
 ### Feature engineering (`clean_datas.py`)
@@ -314,8 +226,6 @@ Le pipeline tourne ensuite automatiquement toutes les minutes.
 - **Preprocessing** : StandardScaler (numériques) + OneHotEncoder (catégorielles)
 - **Gestion du déséquilibre** : `class_weight="balanced"` (~0.58% de fraudes)
 - **Métriques loggées** : accuracy, precision, recall, F1, ROC-AUC
-
----
 
 ## API
 
@@ -365,20 +275,6 @@ Retourne la prédiction de fraude pour une transaction.
 { "status": "ok" }
 ```
 
----
-
-## Tests
-
-```bash
-cd 04_fraud_detection
-pip install pytest httpx
-pytest services/api/tests/ -v
-```
-
-Les tests mockent MLflow — ils tournent sans Docker.
-
----
-
 ## Dashboard Streamlit
 
 Accessible sur [http://localhost:8501](http://localhost:8501)
@@ -388,27 +284,6 @@ Accessible sur [http://localhost:8501](http://localhost:8501)
 - **Graphiques** : fraudes dans le temps, fraudes par catégorie
 - **Performance modèle** : TP/FP/FN/TN, précision, rappel, F1-score
 
----
 
 ## Schéma de la base de données (Supabase)
-
-```
-cardholders      ← porteurs de carte
-merchants        ← marchands
-transactions     ← transactions brutes (avec is_fraud réel)
-model_versions   ← runs MLflow utilisés pour les prédictions
-predictions      ← prédictions du modèle (fraud_score, is_fraud)
-alerts           ← alertes déclenchées sur prédictions positives
-```
-
----
-
-## Exploration des données (EDA)
-
-Les notebooks dans `exploration/` documentent l'analyse du dataset :
-
-- **Déséquilibre des classes** : 99.42% légitime / 0.58% fraude
-- **Catégories à risque** : `shopping_net`, `grocery_net`, `misc_net`
-- **Pattern temporel** : pic de fraude entre 22h et 4h
-- **Profil ciblé** : personnes âgées (65+) légèrement plus exposées
-- **Variable la plus corrélée** : `amt` (montant) et `hour` (heure)
+![schema_db](shema_db_supabase.png)
