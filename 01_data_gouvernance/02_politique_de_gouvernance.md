@@ -8,21 +8,22 @@ Ce document définit les principes, les exigences de conformité et les rôles e
 
 ## 2. Principes de gouvernance des données
 
-*Source : Governance Principles Guide*
+*Source : Governance Principles Guide — aligné sur les 10 dimensions du DMBOK*
 
-La gouvernance des données chez Spotify repose sur neuf principes fondamentaux :
+La gouvernance des données chez Spotify repose sur dix dimensions fondamentales issues du référentiel DMBOK, chacune traduite en engagement opérationnel :
 
-| **Principe** | **Engagement** | **Mise en œuvre** |
-| --- | --- | --- |
-| **Responsabilité** | Chaque dataset possède un Data Steward désigné | Matrice RACI — Comité de Gouvernance |
-| **Transparence** | *"All data processing activities must be transparent to users"* | Politique de confidentialité — documentation des flux |
-| **Sécurité** | Protection maximale des données sensibles | RBAC — MFA — chiffrement AES-256 — PCI-DSS pour les paiements |
-| **Qualité** | *"Spotify must ensure the data it collects is accurate, complete, and reliable"* | Scores qualité sur 5 dimensions — audits trimestriels |
-| **Conformité** | *"Spotify's data governance must comply with GDPR, CCPA, and PCI-DSS"* | DPO dédié — programme de formation continue |
-| **Minimisation** | Collecter uniquement les données nécessaires aux finalités définies | Suppression automatique — validation de toute nouvelle collecte |
-| **Droits utilisateurs** | *"Users should be able to easily access, modify, or delete their personal data"* | Portail utilisateur — traitement sous 30 jours |
-| **Amélioration continue** | *"Regular assessments and improvements should be made to the governance framework"* | Veille réglementaire — revue annuelle |
-| **Éthique** | Usage responsable des données et des systèmes d'IA | Transparence algorithmique — tests de biais sur les modèles ML |
+| **Dimension DMBOK** | **Principe (définition DMBOK)** | **Engagement Spotify** | **Mise en œuvre** |
+| --- | --- | --- | --- |
+| **Data Governance** | Disponibilité, utilisabilité, intégrité et sécurité des données | Gouvernance dirigée par le CDO, soutenu par les Data Stewards, le DPO et le Comité de Gouvernance, pour garantir qualité, conformité et sécurité des données | Responsabilité, transparence et amélioration continue — aligné sur le Governance Principles Guide |
+| **Data Architecture** | Cadre, règles et modèles structurant la collecte, le stockage et l'utilisation des données | Infrastructure moderne et scalable, encore partiellement intégrée entre départements — objectif : vision unifiée et fiable du patrimoine data | Modèles de données cohérents — cadre centralisé piloté par la gouvernance — principes de sécurité et de minimisation |
+| **Data Development** | Création, test et maintenance des bases de données et pipelines de données | Équipes techniques collaborant avec les Data Stewards pour concevoir et maintenir des pipelines fiables, dans une logique de proactivité et de conformité | Principes de data quality et d'ethical use — cohérence et qualité garanties à chaque étape de développement |
+| **Database Operations** | Gestion et maintenance quotidiennes des bases de données | Contrôle constant de la performance, de la sécurité et de la conformité, sous supervision du Data Governance Committee | Sécurité opérationnelle — gestion du cycle de vie des données — accountability et amélioration continue |
+| **Data Security** | Protection contre les accès non autorisés, la corruption et les violations | Sécurité encadrée par le DPO avec politiques d'accès, d'encryption et de réponse aux incidents — conformité PCI-DSS et RGPD | Protection, transparence et minimisation — confidentialité et intégrité du patrimoine informationnel garanties |
+| **Reference & Master Data Management** | Source unique et fiable pour les données de référence critiques | Référentiel centralisé pour harmoniser les données clés entre départements — Data Stewards garants de la cohérence des "golden records" | Élimination des doublons et incohérences — qualité, traçabilité et responsabilité des données |
+| **Data Warehousing & BI** | Centralisation des données et analyse pour la prise de décision | Entrepôts de données alimentant tableaux de bord et personnalisation des expériences utilisateurs — l'une des maturités les plus fortes de Spotify | Data quality, utilisation éthique et amélioration continue — usage responsable et stratégique de la donnée |
+| **Document & Content Management** | Création, organisation, stockage et récupération des documents et contenus numériques | Politiques claires d'accès, de stockage et de sécurité documentaire sous supervision du DPO et du Comité de Gouvernance — conformité RGPD et CCPA | Transparence et traçabilité — processus de conformité continue aux cadres réglementaires |
+| **Metadata Management** | Données sur les données — contexte, origine, format et traçabilité | Traçabilité complète des actifs informationnels guidée par les principes d'accountability et de data quality | Documentation des sources, formats et propriétaires de données — favorise compréhension, gouvernance et réutilisation à l'échelle |
+| **Data Quality** | Exactitude, exhaustivité, cohérence, unicité et actualité des données | Audits réguliers et indicateurs de qualité supervisés par le CDO et les Data Stewards — décisions fondées sur des données fiables et conformes aux standards internationaux | Exactitude et cohérence garanties — conformité aux standards internes et réglementaires |
 
 ## 3. Conformité réglementaire
 
